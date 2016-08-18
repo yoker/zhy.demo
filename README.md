@@ -1,14 +1,15 @@
-1、对原表结构进行索引构建（方便后续重建表结构后的数据导出）
--------------------------------------------------------------
+## 纯数据库实现方案
+
+### 1、对原表结构进行索引构建（方便后续重建表结构后的数据导出）
+```sql
 create index ix_hm1 on hm_tb(hm1)
 create index ix_hm2 on hm_tb(hm2)
 create index ix_hm3 on hm_tb(hm3)
 create index ix_hm4 on hm_tb(hm4)
+```
 
-
-
-2、重建表结构
------------------------------------
+### 2、重建表结构
+```sql
 set nocount on
 declare @sql varchar(100)
 declare @ii int
@@ -20,11 +21,11 @@ begin
 	execute(@sql)
 	set @index = @index + 1
 end
+```
 
 
-
-3、数据导入到新表结构中
------------------------------------
+### 3、数据导入到新表结构中
+```sql
 set nocount on
 declare @sql1 varchar(100)
 declare @sql2 varchar(100)
@@ -47,11 +48,11 @@ begin
 	set @index = @index + 1
 end
 print @index
+```
 
 
-
-4、构建查询存储过程
------------------------------------
+### 4、构建查询存储过程
+```sql
 CREATE PROCEDURE [dbo].[getrows]
 	@hm1 int, 
 	@hm2 int,
@@ -89,10 +90,10 @@ BEGIN
 	+') as T'
 	execute(@sql);
 END
+```
 
-
-4、终极完整模式存储过程
-------------------------------------------
+### 4、终极完整模式存储过程
+```sql
 CREATE PROCEDURE [dbo].[getrows2]
 	@hm1 int, 
 	@hm2 int,
@@ -143,17 +144,16 @@ BEGIN
 		+'where dbo.bit_count(hm1^' + @hash1 + ')+dbo.bit_count(hm2^' + @hash2 + ')+dbo.bit_count(hm3^' + @hash3 + ')+dbo.bit_count(hm4^' + @hash4 + ')<=4 '
 	execute(@sql)
 END
+```
 
 
 
-
-5、查询测试
---------------------------------
+### 5、查询测试
+```sql
 set statistics io on
 set statistics time on
 set statistics profile on
 
 exec getrows 11,54960,5634,35976
 exec getrows2 11,54960,5634,35976
-
-
+```
